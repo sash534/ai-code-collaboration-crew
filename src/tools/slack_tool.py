@@ -24,13 +24,3 @@ class SlackSendMessageTool(BaseTool):
             icon_emoji=":rotating_light:",
         )
         return json.dumps(result, indent=2)
-
-
-class SlackListChannelsTool(BaseTool):
-    name: str = "list_slack_channels"
-    description: str = "List available Slack channels to determine where to send notifications."
-
-    def _run(self) -> str:
-        client = ServiceClient("slack")
-        result = client.get("/channels")
-        return json.dumps(result, indent=2)

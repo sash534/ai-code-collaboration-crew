@@ -20,7 +20,19 @@ class StackTracesInput(BaseModel):
 
 
 class ApiErrorsInput(BaseModel):
-    endpoint: Optional[str] = Field(default=None, description="API endpoint path to filter by")
+    endpoint: str = Field(..., description="API endpoint path to filter by (e.g. '/api/v1/payments/process')")
+
+
+class HostsInput(BaseModel):
+    service: str = Field(..., description="Service name to get hosts for (e.g. 'payment-svc')")
+
+
+class AlertsInput(BaseModel):
+    service: str = Field(..., description="Service name to check alerts for (e.g. 'payment-svc')")
+
+
+class DeploysInput(BaseModel):
+    service: str = Field(..., description="Service name to get recent deploys for (e.g. 'payment-svc')")
 
 
 class SplunkSearchErrorsTool(BaseTool):
@@ -67,20 +79,18 @@ class SplunkApiErrorsTool(BaseTool):
     description: str = "Search for API endpoint errors with HTTP status codes, error counts, and time ranges. Useful for identifying which endpoints are failing."
     args_schema: type[BaseModel] = ApiErrorsInput
 
-    def _run(self, endpoint: Optional[str] = None) -> str:
+    def _run(self, endpoint: str) -> str:
         client = ServiceClient("splunk")
-        params = {}
-        if endpoint:
-            params["endpoint"] = endpoint
-        result = client.get("/search/api_errors", **params)
+        result = client.get("/search/api_errors", endpoint=endpoint)
         return json.dumps(result, indent=2)
 
 
 class SplunkHostsTool(BaseTool):
     name: str = "get_hosts"
     description: str = "List all hosts and their health status (healthy, degraded, critical). Useful for determining blast radius."
+    args_schema: type[BaseModel] = HostsInput
 
-    def _run(self) -> str:
+    def _run(self, service: str) -> str:
         client = ServiceClient("splunk")
         result = client.get("/hosts")
         return json.dumps(result, indent=2)
@@ -89,8 +99,9 @@ class SplunkHostsTool(BaseTool):
 class SplunkAlertsTool(BaseTool):
     name: str = "get_alerts"
     description: str = "List all currently active alerts/alarms from the monitoring system. Returns alert names, severity, trigger times."
+    args_schema: type[BaseModel] = AlertsInput
 
-    def _run(self) -> str:
+    def _run(self, service: str) -> str:
         client = ServiceClient("splunk")
         result = client.get("/alerts")
         return json.dumps(result, indent=2)
@@ -99,8 +110,9 @@ class SplunkAlertsTool(BaseTool):
 class SplunkDeploysTool(BaseTool):
     name: str = "get_recent_deploys"
     description: str = "Get recent deployment events. Returns commit SHAs, authors, timestamps, and changed files. Useful for correlating incidents with recent deployments."
+    args_schema: type[BaseModel] = DeploysInput
 
-    def _run(self) -> str:
+    def _run(self, service: str) -> str:
         client = ServiceClient("splunk")
         result = client.get("/deploys")
         return json.dumps(result, indent=2)

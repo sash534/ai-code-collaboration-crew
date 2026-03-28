@@ -15,6 +15,10 @@ class GetCommitInput(BaseModel):
     sha: str = Field(..., description="Commit SHA to retrieve details for")
 
 
+class ListCommitsInput(BaseModel):
+    repo: str = Field(..., description="Repository name to list commits for (e.g. 'platform')")
+
+
 class CreatePRInput(BaseModel):
     title: str = Field(..., description="Pull request title")
     body: str = Field(..., description="Pull request description with context about the fix")
@@ -35,8 +39,9 @@ class GitHubSearchCodeTool(BaseTool):
 class GitHubListCommitsTool(BaseTool):
     name: str = "list_recent_commits"
     description: str = "List recent commits in the repository. Returns commit SHAs, authors, messages, timestamps, and changed files."
+    args_schema: type[BaseModel] = ListCommitsInput
 
-    def _run(self) -> str:
+    def _run(self, repo: str) -> str:
         client = ServiceClient("github")
         result = client.get(f"/repos/{MOCK_OWNER}/{MOCK_REPO}/commits")
         return json.dumps(result, indent=2)

@@ -41,4 +41,5 @@ def build_incident_crew(service: str) -> Crew:
         process=Process.sequential,
         verbose=True,
         memory=False,
+        max_rpm=20,
     )

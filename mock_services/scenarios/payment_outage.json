@@ -1,0 +1,240 @@
+{
+  "name": "payment_outage",
+  "title": "Payment Service Outage — HTTP 500 Spike",
+  "service": "payment-svc",
+  "alerts": [
+    {
+      "id": "ALERT-4821",
+      "name": "payment-svc HTTP 500 rate > 10/min",
+      "severity": "critical",
+      "triggered_at": "2026-03-28T03:47:12Z",
+      "search_query": "index=prod sourcetype=access_log host=payment-svc* status=500",
+      "result_count": 847
+    }
+  ],
+  "hosts": [
+    {"hostname": "payment-svc-prod-01", "status": "degraded", "ip": "10.0.5.11"},
+    {"hostname": "payment-svc-prod-02", "status": "degraded", "ip": "10.0.5.12"},
+    {"hostname": "payment-svc-prod-03", "status": "healthy", "ip": "10.0.5.13"},
+    {"hostname": "payment-svc-prod-04", "status": "degraded", "ip": "10.0.5.14"}
+  ],
+  "error_logs": [
+    {
+      "timestamp": "2026-03-28T03:47:14.332Z",
+      "host": "payment-svc-prod-01",
+      "level": "ERROR",
+      "service": "payment-svc",
+      "endpoint": "/api/v1/payments/process",
+      "status": 500,
+      "method": "POST",
+      "message": "NullPointerException: Cannot invoke method getToken() on null reference",
+      "trace_id": "txn-9a8b7c6d-5e4f",
+      "user_id": "usr_382910",
+      "duration_ms": 12
+    },
+    {
+      "timestamp": "2026-03-28T03:47:14.518Z",
+      "host": "payment-svc-prod-02",
+      "level": "ERROR",
+      "service": "payment-svc",
+      "endpoint": "/api/v1/payments/process",
+      "status": 500,
+      "method": "POST",
+      "message": "NullPointerException: Cannot invoke method getToken() on null reference",
+      "trace_id": "txn-1f2e3d4c-5b6a",
+      "user_id": "usr_109283",
+      "duration_ms": 8
+    },
+    {
+      "timestamp": "2026-03-28T03:47:15.001Z",
+      "host": "payment-svc-prod-01",
+      "level": "ERROR",
+      "service": "payment-svc",
+      "endpoint": "/api/v1/payments/process",
+      "status": 500,
+      "method": "POST",
+      "message": "NullPointerException: Cannot invoke method getToken() on null reference",
+      "trace_id": "txn-7g8h9i0j-1k2l",
+      "user_id": "usr_556721",
+      "duration_ms": 15
+    },
+    {
+      "timestamp": "2026-03-28T03:47:15.204Z",
+      "host": "payment-svc-prod-04",
+      "level": "ERROR",
+      "service": "payment-svc",
+      "endpoint": "/api/v1/payments/refund",
+      "status": 500,
+      "method": "POST",
+      "message": "NullPointerException: Cannot invoke method getToken() on null reference",
+      "trace_id": "txn-3m4n5o6p-7q8r",
+      "user_id": "usr_889012",
+      "duration_ms": 11
+    },
+    {
+      "timestamp": "2026-03-28T03:47:16.780Z",
+      "host": "payment-svc-prod-02",
+      "level": "WARN",
+      "service": "payment-svc",
+      "endpoint": "/api/v1/payments/status",
+      "status": 200,
+      "method": "GET",
+      "message": "Upstream token service returned empty response for card tokenization",
+      "trace_id": "txn-9s0t1u2v-3w4x",
+      "user_id": "usr_334455",
+      "duration_ms": 340
+    },
+    {
+      "timestamp": "2026-03-28T03:35:00.000Z",
+      "host": "payment-svc-prod-01",
+      "level": "INFO",
+      "service": "payment-svc",
+      "endpoint": "DEPLOY",
+      "status": 0,
+      "method": "SYSTEM",
+      "message": "Deployment started: commit a1b2c3d by deploy-bot, image payment-svc:v2.14.3",
+      "trace_id": "deploy-20260328-0335",
+      "user_id": "deploy-bot",
+      "duration_ms": 0
+    },
+    {
+      "timestamp": "2026-03-28T03:36:22.000Z",
+      "host": "payment-svc-prod-01",
+      "level": "INFO",
+      "service": "payment-svc",
+      "endpoint": "DEPLOY",
+      "status": 0,
+      "method": "SYSTEM",
+      "message": "Deployment completed: commit a1b2c3d, all 4 pods healthy",
+      "trace_id": "deploy-20260328-0335",
+      "user_id": "deploy-bot",
+      "duration_ms": 82000
+    }
+  ],
+  "stack_traces": [
+    {
+      "timestamp": "2026-03-28T03:47:14.332Z",
+      "host": "payment-svc-prod-01",
+      "service": "payment-svc",
+      "exception": "java.lang.NullPointerException",
+      "message": "Cannot invoke method getToken() on null reference",
+      "trace": [
+        "at com.acme.payment.PaymentProcessor.processPayment(PaymentProcessor.java:142)",
+        "at com.acme.payment.PaymentController.handlePayment(PaymentController.java:87)",
+        "at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)",
+        "at org.springframework.web.servlet.FrameworkServlet.service(FrameworkServlet.java:897)",
+        "at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:231)"
+      ],
+      "trace_id": "txn-9a8b7c6d-5e4f",
+      "count": 423
+    },
+    {
+      "timestamp": "2026-03-28T03:47:18.112Z",
+      "host": "payment-svc-prod-02",
+      "service": "payment-svc",
+      "exception": "java.lang.NullPointerException",
+      "message": "Cannot invoke method getToken() on null reference",
+      "trace": [
+        "at com.acme.payment.PaymentProcessor.processPayment(PaymentProcessor.java:142)",
+        "at com.acme.payment.PaymentController.handlePayment(PaymentController.java:87)",
+        "at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)",
+        "at org.springframework.web.servlet.FrameworkServlet.service(FrameworkServlet.java:897)"
+      ],
+      "trace_id": "txn-1f2e3d4c-5b6a",
+      "count": 312
+    },
+    {
+      "timestamp": "2026-03-28T03:48:02.554Z",
+      "host": "payment-svc-prod-04",
+      "service": "payment-svc",
+      "exception": "com.acme.payment.TokenServiceException",
+      "message": "Token service returned null for card_id=card_****7823",
+      "trace": [
+        "at com.acme.payment.TokenClient.fetchToken(TokenClient.java:56)",
+        "at com.acme.payment.PaymentProcessor.processPayment(PaymentProcessor.java:138)",
+        "at com.acme.payment.PaymentController.handlePayment(PaymentController.java:87)"
+      ],
+      "trace_id": "txn-3m4n5o6p-7q8r",
+      "count": 112
+    }
+  ],
+  "api_errors": [
+    {
+      "endpoint": "/api/v1/payments/process",
+      "method": "POST",
+      "status": 500,
+      "count": 735,
+      "first_seen": "2026-03-28T03:47:12Z",
+      "last_seen": "2026-03-28T04:15:00Z",
+      "sample_error": "NullPointerException: Cannot invoke method getToken() on null reference"
+    },
+    {
+      "endpoint": "/api/v1/payments/refund",
+      "method": "POST",
+      "status": 500,
+      "count": 112,
+      "first_seen": "2026-03-28T03:47:15Z",
+      "last_seen": "2026-03-28T04:15:00Z",
+      "sample_error": "NullPointerException: Cannot invoke method getToken() on null reference"
+    }
+  ],
+  "deploys": [
+    {
+      "commit_sha": "a1b2c3d",
+      "author": "jsmith",
+      "message": "refactor: extract token handling into separate module",
+      "timestamp": "2026-03-28T03:35:00Z",
+      "files_changed": ["src/main/java/com/acme/payment/PaymentProcessor.java", "src/main/java/com/acme/payment/TokenClient.java"],
+      "image": "payment-svc:v2.14.3"
+    },
+    {
+      "commit_sha": "f8e7d6c",
+      "author": "agarcia",
+      "message": "feat: add retry logic for downstream calls",
+      "timestamp": "2026-03-27T14:22:00Z",
+      "files_changed": ["src/main/java/com/acme/payment/RetryHandler.java"],
+      "image": "payment-svc:v2.14.2"
+    }
+  ],
+  "commits": [
+    {
+      "sha": "a1b2c3d",
+      "author": "jsmith",
+      "message": "refactor: extract token handling into separate module",
+      "timestamp": "2026-03-28T03:30:00Z",
+      "files": [
+        {
+          "path": "src/main/java/com/acme/payment/PaymentProcessor.java",
+          "diff": "@@ -135,10 +135,8 @@\n     public PaymentResult processPayment(PaymentRequest request) {\n-        String token = this.tokenService.getToken(request.getCardId());\n-        if (token == null) {\n-            throw new TokenServiceException(\"Token not found\");\n-        }\n+        // Refactored: delegate to TokenClient\n+        String token = this.tokenClient.fetchToken(request.getCardId()).getToken();\n         return executePayment(token, request.getAmount());\n     }"
+        },
+        {
+          "path": "src/main/java/com/acme/payment/TokenClient.java",
+          "diff": "@@ -50,6 +50,10 @@\n+    public TokenResponse fetchToken(String cardId) {\n+        // BUG: Returns null when upstream token service is unavailable\n+        // instead of throwing TokenServiceException\n+        return restTemplate.getForObject(tokenServiceUrl + \"/tokens/\" + cardId, TokenResponse.class);\n+    }"
+        }
+      ]
+    },
+    {
+      "sha": "f8e7d6c",
+      "author": "agarcia",
+      "message": "feat: add retry logic for downstream calls",
+      "timestamp": "2026-03-27T14:22:00Z",
+      "files": [
+        {
+          "path": "src/main/java/com/acme/payment/RetryHandler.java",
+          "diff": "@@ -1,0 +1,45 @@\n+public class RetryHandler {\n+    // ... retry logic ...\n+}"
+        }
+      ]
+    },
+    {
+      "sha": "b5c6d7e",
+      "author": "mwong",
+      "message": "chore: update dependencies",
+      "timestamp": "2026-03-27T10:15:00Z",
+      "files": [{"path": "pom.xml", "diff": "@@ -22,3 +22,3 @@\n-  <version>2.7.1</version>\n+  <version>2.7.3</version>"}]
+    }
+  ],
+  "affected_users_count": 15234,
+  "error_rate_per_minute": 847,
+  "normal_error_rate_per_minute": 2,
+  "severity_hint": "SEV-1"
+}

@@ -1,7 +1,7 @@
 [project]
 name = "ai-code-collaboration-crew"
-version = "0.1.0"
-description = "Multi-agent AI system for collaborative code generation, review, and testing using CrewAI"
+version = "0.2.0"
+description = "Multi-agent AI system for collaborative code generation, review, testing, and automated incident response using CrewAI"
 authors = [{ name = "Your Name" }]
 requires-python = ">=3.10"
 
@@ -10,6 +10,9 @@ dependencies = [
     "litellm>=1.75.3",
     "openai",
     "python-dotenv",
+    "fastapi",
+    "uvicorn",
+    "httpx",
 ]
 
 [tool.uv]

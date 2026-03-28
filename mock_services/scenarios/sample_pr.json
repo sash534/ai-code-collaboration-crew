@@ -1,0 +1,48 @@
+{
+  "name": "sample_pr",
+  "title": "Sample PR for local review testing",
+  "pull_request": {
+    "number": 1,
+    "title": "feat: add user authentication middleware",
+    "body": "Adds JWT-based authentication middleware for the API layer.\n\n## Changes\n- New `auth.py` middleware\n- Updated `app.py` to register the middleware\n- Added login endpoint\n\n## Testing\n- Manual testing against local server\n- Unit tests pending",
+    "state": "open",
+    "user": { "login": "sash534" },
+    "head": { "ref": "feature/auth-middleware", "sha": "abc1234" },
+    "base": { "ref": "main", "sha": "def5678" },
+    "html_url": "https://github.com/sash534/ai-code-collaboration-crew/pull/1",
+    "created_at": "2026-03-27T10:00:00Z",
+    "updated_at": "2026-03-27T14:30:00Z",
+    "additions": 98,
+    "deletions": 4,
+    "changed_files": 3
+  },
+  "pull_request_files": [
+    {
+      "sha": "a1b2c3d4",
+      "filename": "src/middleware/auth.py",
+      "status": "added",
+      "additions": 62,
+      "deletions": 0,
+      "changes": 62,
+      "patch": "@@ -0,0 +1,62 @@\n+import jwt\n+import os\n+from functools import wraps\n+from flask import request, jsonify\n+\n+SECRET_KEY = os.getenv(\"JWT_SECRET\", \"changeme-insecure-default\")\n+\n+\n+def decode_token(token: str) -> dict:\n+    try:\n+        return jwt.decode(token, SECRET_KEY, algorithms=[\"HS256\"])\n+    except jwt.ExpiredSignatureError:\n+        return None\n+    except jwt.InvalidTokenError:\n+        return None\n+\n+\n+def require_auth(f):\n+    @wraps(f)\n+    def decorated(*args, **kwargs):\n+        auth_header = request.headers.get(\"Authorization\", \"\")\n+        if not auth_header.startswith(\"Bearer \"):\n+            return jsonify({\"error\": \"Missing token\"}), 401\n+        token = auth_header.split(\" \")[1]\n+        payload = decode_token(token)\n+        if payload is None:\n+            return jsonify({\"error\": \"Invalid token\"}), 401\n+        request.user = payload\n+        return f(*args, **kwargs)\n+    return decorated\n+\n+\n+def login(username: str, password: str) -> str:\n+    # WARNING: plaintext password comparison for demo purposes\n+    USERS = {\n+        \"admin\": \"admin123\",\n+        \"user1\": \"password\",\n+    }\n+    if USERS.get(username) == password:\n+        token = jwt.encode(\n+            {\"sub\": username, \"role\": \"admin\" if username == \"admin\" else \"user\"},\n+            SECRET_KEY,\n+            algorithm=\"HS256\",\n+        )\n+        return token\n+    return None\n+\n+\n+def get_db_connection():\n+    import sqlite3\n+    conn = sqlite3.connect(\"app.db\")\n+    return conn\n+\n+\n+def find_user(username: str):\n+    conn = get_db_connection()\n+    cursor = conn.execute(\n+        f\"SELECT * FROM users WHERE username = '{username}'\"\n+    )\n+    return cursor.fetchone()"
+    },
+    {
+      "sha": "e5f6a7b8",
+      "filename": "src/app.py",
+      "status": "modified",
+      "additions": 12,
+      "deletions": 2,
+      "changes": 14,
+      "patch": "@@ -1,6 +1,8 @@\n-from flask import Flask\n+from flask import Flask, request, jsonify\n+from src.middleware.auth import require_auth, login\n \n app = Flask(__name__)\n \n+@app.route(\"/login\", methods=[\"POST\"])\n+def login_endpoint():\n+    data = request.get_json()\n+    token = login(data[\"username\"], data[\"password\"])\n+    if token:\n+        return jsonify({\"token\": token})\n+    return jsonify({\"error\": \"Invalid credentials\"}), 401\n+\n \n @app.route(\"/health\")\n+@require_auth\n def health():\n     return {\"status\": \"ok\"}"
+    },
+    {
+      "sha": "c9d0e1f2",
+      "filename": "tests/test_auth.py",
+      "status": "added",
+      "additions": 24,
+      "deletions": 0,
+      "changes": 24,
+      "patch": "@@ -0,0 +1,24 @@\n+import pytest\n+from src.middleware.auth import decode_token, login\n+\n+\n+def test_login_valid():\n+    token = login(\"admin\", \"admin123\")\n+    assert token is not None\n+\n+\n+def test_login_invalid():\n+    token = login(\"admin\", \"wrong\")\n+    assert token is None\n+\n+\n+def test_decode_valid_token():\n+    token = login(\"admin\", \"admin123\")\n+    payload = decode_token(token)\n+    assert payload[\"sub\"] == \"admin\"\n+\n+\n+def test_decode_expired_token():\n+    # TODO: test with expired token\n+    pass"
+    }
+  ]
+}

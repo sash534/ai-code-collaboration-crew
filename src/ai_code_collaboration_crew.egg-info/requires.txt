@@ -1,0 +1,7 @@
+crewai
+litellm>=1.75.3
+openai
+python-dotenv
+fastapi
+uvicorn
+httpx

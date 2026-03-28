@@ -1,0 +1,186 @@
+{
+  "name": "auth_failure",
+  "title": "Auth Service Failure — Login Success Rate Drop",
+  "service": "auth-svc",
+  "alerts": [
+    {
+      "id": "ALERT-5102",
+      "name": "auth-svc login success rate < 90%",
+      "severity": "critical",
+      "triggered_at": "2026-03-28T14:25:00Z",
+      "search_query": "index=prod sourcetype=app_log host=auth-svc* level=ERROR",
+      "result_count": 2341
+    }
+  ],
+  "hosts": [
+    {"hostname": "auth-svc-prod-01", "status": "degraded", "ip": "10.0.3.21"},
+    {"hostname": "auth-svc-prod-02", "status": "degraded", "ip": "10.0.3.22"},
+    {"hostname": "auth-svc-prod-03", "status": "degraded", "ip": "10.0.3.23"},
+    {"hostname": "redis-session-01", "status": "critical", "ip": "10.0.3.50"},
+    {"hostname": "redis-session-02", "status": "critical", "ip": "10.0.3.51"}
+  ],
+  "error_logs": [
+    {
+      "timestamp": "2026-03-28T14:25:01.112Z",
+      "host": "auth-svc-prod-01",
+      "level": "ERROR",
+      "service": "auth-svc",
+      "endpoint": "/api/v1/auth/login",
+      "status": 503,
+      "method": "POST",
+      "message": "RedisConnectionException: Unable to acquire connection from pool — max pool size (5) reached, all connections busy",
+      "trace_id": "auth-tx-a1b2c3",
+      "user_id": "usr_120345",
+      "duration_ms": 5002
+    },
+    {
+      "timestamp": "2026-03-28T14:25:01.334Z",
+      "host": "auth-svc-prod-02",
+      "level": "ERROR",
+      "service": "auth-svc",
+      "endpoint": "/api/v1/auth/login",
+      "status": 503,
+      "method": "POST",
+      "message": "RedisConnectionException: Connection pool exhausted after 5000ms timeout",
+      "trace_id": "auth-tx-d4e5f6",
+      "user_id": "usr_998877",
+      "duration_ms": 5001
+    },
+    {
+      "timestamp": "2026-03-28T14:25:02.556Z",
+      "host": "auth-svc-prod-03",
+      "level": "ERROR",
+      "service": "auth-svc",
+      "endpoint": "/api/v1/auth/refresh",
+      "status": 503,
+      "method": "POST",
+      "message": "RedisConnectionException: Unable to acquire connection from pool — max pool size (5) reached",
+      "trace_id": "auth-tx-g7h8i9",
+      "user_id": "usr_445566",
+      "duration_ms": 5003
+    },
+    {
+      "timestamp": "2026-03-28T14:22:30.000Z",
+      "host": "auth-svc-prod-01",
+      "level": "INFO",
+      "service": "auth-svc",
+      "endpoint": "CONFIG_CHANGE",
+      "status": 0,
+      "method": "SYSTEM",
+      "message": "Configuration updated via ConfigMap: REDIS_MAX_CONNECTIONS changed from 100 to 5 (applied by config-bot)",
+      "trace_id": "config-push-20260328",
+      "user_id": "config-bot",
+      "duration_ms": 0
+    },
+    {
+      "timestamp": "2026-03-28T14:23:00.000Z",
+      "host": "redis-session-01",
+      "level": "WARN",
+      "service": "redis",
+      "endpoint": "CONNECTIONS",
+      "status": 0,
+      "method": "SYSTEM",
+      "message": "Connection pool resized: max_connections=5 (was 100). Active connections: 47 exceeds new max.",
+      "trace_id": "config-push-20260328",
+      "user_id": "system",
+      "duration_ms": 0
+    },
+    {
+      "timestamp": "2026-03-28T14:25:05.000Z",
+      "host": "auth-svc-prod-01",
+      "level": "ERROR",
+      "service": "auth-svc",
+      "endpoint": "/api/v1/auth/login",
+      "status": 503,
+      "method": "POST",
+      "message": "Session creation failed: could not store session in Redis — pool exhausted",
+      "trace_id": "auth-tx-j0k1l2",
+      "user_id": "usr_112233",
+      "duration_ms": 5005
+    }
+  ],
+  "stack_traces": [
+    {
+      "timestamp": "2026-03-28T14:25:01.112Z",
+      "host": "auth-svc-prod-01",
+      "service": "auth-svc",
+      "exception": "redis.clients.jedis.exceptions.JedisConnectionException",
+      "message": "Unable to acquire connection from pool — max pool size (5) reached, all connections busy",
+      "trace": [
+        "at redis.clients.jedis.JedisPool.getResource(JedisPool.java:256)",
+        "at com.acme.auth.session.RedisSessionStore.createSession(RedisSessionStore.java:89)",
+        "at com.acme.auth.AuthService.login(AuthService.java:134)",
+        "at com.acme.auth.AuthController.handleLogin(AuthController.java:52)",
+        "at org.springframework.web.servlet.FrameworkServlet.service(FrameworkServlet.java:897)"
+      ],
+      "trace_id": "auth-tx-a1b2c3",
+      "count": 1890
+    },
+    {
+      "timestamp": "2026-03-28T14:25:03.445Z",
+      "host": "auth-svc-prod-02",
+      "service": "auth-svc",
+      "exception": "redis.clients.jedis.exceptions.JedisExhaustedPoolException",
+      "message": "Connection pool exhausted after 5000ms timeout",
+      "trace": [
+        "at redis.clients.jedis.JedisPool.getResource(JedisPool.java:260)",
+        "at com.acme.auth.session.RedisSessionStore.getSession(RedisSessionStore.java:67)",
+        "at com.acme.auth.AuthService.refreshToken(AuthService.java:178)",
+        "at com.acme.auth.AuthController.handleRefresh(AuthController.java:71)"
+      ],
+      "trace_id": "auth-tx-d4e5f6",
+      "count": 451
+    }
+  ],
+  "api_errors": [
+    {
+      "endpoint": "/api/v1/auth/login",
+      "method": "POST",
+      "status": 503,
+      "count": 1890,
+      "first_seen": "2026-03-28T14:25:00Z",
+      "last_seen": "2026-03-28T15:10:00Z",
+      "sample_error": "RedisConnectionException: Unable to acquire connection from pool"
+    },
+    {
+      "endpoint": "/api/v1/auth/refresh",
+      "method": "POST",
+      "status": 503,
+      "count": 451,
+      "first_seen": "2026-03-28T14:25:02Z",
+      "last_seen": "2026-03-28T15:10:00Z",
+      "sample_error": "RedisConnectionException: Connection pool exhausted"
+    }
+  ],
+  "deploys": [],
+  "commits": [
+    {
+      "sha": "c9d8e7f",
+      "author": "config-bot",
+      "message": "chore: update Redis connection pool settings per cost optimization ticket OPS-4421",
+      "timestamp": "2026-03-28T14:20:00Z",
+      "files": [
+        {
+          "path": "k8s/configmaps/auth-svc-config.yaml",
+          "diff": "@@ -12,3 +12,3 @@\n-  REDIS_MAX_CONNECTIONS: \"100\"\n+  REDIS_MAX_CONNECTIONS: \"5\"\n   REDIS_TIMEOUT_MS: \"5000\""
+        }
+      ]
+    },
+    {
+      "sha": "a2b3c4d",
+      "author": "dlee",
+      "message": "feat: add MFA support for login flow",
+      "timestamp": "2026-03-27T18:30:00Z",
+      "files": [
+        {
+          "path": "src/main/java/com/acme/auth/MFAService.java",
+          "diff": "@@ -1,0 +1,60 @@\n+public class MFAService {\n+    // MFA verification logic\n+}"
+        }
+      ]
+    }
+  ],
+  "affected_users_count": 84500,
+  "error_rate_per_minute": 2341,
+  "normal_error_rate_per_minute": 5,
+  "severity_hint": "SEV-1"
+}

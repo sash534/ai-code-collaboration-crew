@@ -1,0 +1,13 @@
+Metadata-Version: 2.4
+Name: ai-code-collaboration-crew
+Version: 0.2.0
+Summary: Multi-agent AI system for collaborative code generation, review, testing, and automated incident response using CrewAI
+Author: Your Name
+Requires-Python: >=3.10
+Requires-Dist: crewai
+Requires-Dist: litellm>=1.75.3
+Requires-Dist: openai
+Requires-Dist: python-dotenv
+Requires-Dist: fastapi
+Requires-Dist: uvicorn
+Requires-Dist: httpx
